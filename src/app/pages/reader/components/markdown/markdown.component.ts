@@ -47,7 +47,7 @@ export class MarkdownComponent {
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['pageUrl'] && this.pageUrl) {
+    if (changes['pageUrl'] && this.pageUrl !== '') {
       this.loadMarkdownContent(this.pageUrl);
     }
   }
