@@ -1,0 +1,30 @@
+<nav>
+    <ul class="space-y-4">
+      <li>
+        <a [routerLink]="['home']" class="flex items-center text-4xl font-extrabold italic text-blue-500 hover:text-blue-700" style="font-family: 'Dancing Script', cursive;">
+          ClassNotes
+        </a>
+      </li>      
+      <div class="w-full border border-2 bg-white"></div>
+        <li *ngFor="let book of books">
+          <div class="flex items-center justify-between">
+            <button 
+              class="toggle-button text-sm text-white hover:text-blue-500 flex items-center"
+              (click)="toggleHidden(book)"
+            >
+              <span>{{book.name}}</span>
+            </button>
+          </div>
+          <ul [ngClass]="{'hidden': book.hidden, 'ml-2 mt-2 space-y-2': true}">
+              <li *ngFor="let page of book.pages">
+                <a 
+                  (click)="setPage(page)"
+                  class="text-xs text-gray-300 hover:text-blue-400"
+                >
+                  {{page.name}}
+                </a>
+            </li>
+          </ul>
+        </li>
+    </ul>
+</nav>

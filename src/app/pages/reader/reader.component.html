@@ -1,0 +1,8 @@
+<div class="bg-gray-900 flex min-h-screen">
+    <aside class="fixed top-0 h-screen w-80 bg-gray-800 p-4 overflow-y-auto">
+        <app-sidebar (pageUrl)="setPageUrl($event)"></app-sidebar>
+    </aside>
+    <div class="ml-80 p-4 text-gray-300 overflow-x-auto">
+        <app-markdown [pageUrl]="pageUrl"></app-markdown>
+    </div>
+</div>
