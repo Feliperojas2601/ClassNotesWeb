@@ -27,7 +27,6 @@ export class SidebarComponent {
     async ngOnInit() {
       this.books = await this.githubService.getBooks();
       this.books.forEach(book => book.hidden = true);
-      console.log(this.books);
     }
 
     setPage(page: Page) {
