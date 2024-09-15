@@ -7,7 +7,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class GithubService {
-  private GITHUB_TOKEN = environment.githubToken;
+  private GITHUB_TOKEN = process.env['GITHUB_TOKEN'];
 
   private octokit = new Octokit({ 
       auth: this.GITHUB_TOKEN,
