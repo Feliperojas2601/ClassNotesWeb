@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Octokit } from "octokit";
-import { env } from 'process';
-import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
