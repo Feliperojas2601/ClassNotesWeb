@@ -1,4 +1,4 @@
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, inject, Input, NgZone, SimpleChanges } from '@angular/core';
 import { marked } from 'marked';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css';
@@ -15,11 +15,14 @@ export class MarkdownComponent {
   @Input() pageUrl: string = '';
   content: string = '';
 
-  constructor(private githubService: GithubService) {
+  constructor(
+    private githubService: GithubService, 
+  ) {}
+
+  ngOnInit() {
     this.setupMarked();
   }
 
-  // Configuración de 'marked' similar a la que tenías en Astro
   setupMarked() {
     const renderer = new marked.Renderer();
     renderer.heading = ({tokens, depth}) => {

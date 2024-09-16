@@ -6,54 +6,62 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class GithubService {
-  private GITHUB_TOKEN = environment.githubToken;
-
-  private octokit = new Octokit({ 
-      auth: this.GITHUB_TOKEN,
-  });
-
   constructor() {}
 
   async getBooks() {
-    if (!this.GITHUB_TOKEN) {
-      return [];
-    }
-    const response = await this.octokit.request('GET /repos/{owner}/{repo}/contents/', {
-      owner: 'Feliperojas2601',
-      repo: 'ClassNotes',
-    });
-    const books = await Promise.all(response.data.map(async (item: any) => {
-        return {
-            name: item.name.replaceAll('_', ' '),
-            pages: (await this.getPages(item.name))
-                .filter((page: any) => page !== null)
-                .sort((a: any, b: any) => {
-                    return this.extractNumberFromName(a.name) - this.extractNumberFromName(b.name);
-                }),
-        };
-    }));
-    return books;
-  }
-
-  async getPages(bookName: string) {
-    const response = await this.octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+    try {
+      const GITHUB_TOKEN = environment.githubToken;
+      if (!GITHUB_TOKEN) {
+        throw new Error('No se ha configurado el token de GitHub');
+      }
+      const octokit = new Octokit({ 
+        auth: GITHUB_TOKEN,
+      });
+      const response = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
         owner: 'Feliperojas2601',
         repo: 'ClassNotes',
-        path: bookName,
-    });
-    if (!response) {
-        return [];
+      });
+      const books = await Promise.all(response.data.map(async (item: any) => {
+          return {
+              name: item.name.replaceAll('_', ' '),
+              pages: (await this.getPages(item.name, octokit))
+                  .filter((page: any) => page !== null)
+                  .sort((a: any, b: any) => {
+                      return this.extractNumberFromName(a.name) - this.extractNumberFromName(b.name);
+                  }),
+          };
+      }));
+      return books;  
+    } catch (error) {
+      console.error('Error al cargar los libros:', error);
+      return [];
     }
-    const pages = (response as any).data.map((item: any) => {
-        if (item.name === 'images') {
-            return null;
-        }
-        return {
-            name: item.name,
-            download_url: item.download_url,
-        };
-    });
-    return pages; 
+  }
+
+  async getPages(bookName: string, octokit: any) {
+    try {
+      const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
+          owner: 'Feliperojas2601',
+          repo: 'ClassNotes',
+          path: bookName,
+      });
+      if (!response) {
+          return [];
+      }
+      const pages = (response as any).data.map((item: any) => {
+          if (item.name === 'images') {
+              return null;
+          }
+          return {
+              name: item.name,
+              download_url: item.download_url,
+          };
+      });
+      return pages;  
+    } catch (error) {
+      console.error('Error al cargar las páginas:', error);
+      return [];
+    }
   }
 
   extractNumberFromName(name: string): number {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, NgZone, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { Book } from '../../../../interfaces/book';
 import { GithubService } from '../../../../services/github.service';
@@ -22,12 +22,19 @@ export class SidebarComponent {
 
     constructor(
       private githubService: GithubService
-    ) {}
-
-    async ngOnInit() {
-      this.books = await this.githubService.getBooks();
-      this.books.forEach(book => book.hidden = true);
-    }
+    ) {
+      const ngZone = inject(NgZone);
+      ngZone.runOutsideAngular(() => {
+        this.githubService.getBooks().then(books => {
+          ngZone.run(() => {
+            this.books = books;
+            this.books.forEach(book => book.hidden = true);
+          });
+        }).catch(error => {
+          console.error('Error al cargar los libros:', error);
+        });
+      });
+    } 
 
     setPage(page: Page) {
       this.selectedPage = page;
