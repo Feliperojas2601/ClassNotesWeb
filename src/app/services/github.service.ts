@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { Octokit } from "octokit";
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GithubService {
-  private GITHUB_TOKEN = null;
+  private GITHUB_TOKEN = environment.githubToken;
 
   private octokit = new Octokit({ 
       auth: this.GITHUB_TOKEN,
