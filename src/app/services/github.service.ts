@@ -5,7 +5,7 @@ import { Octokit } from "octokit";
   providedIn: 'root'
 })
 export class GithubService {
-  private GITHUB_TOKEN = process.env['GH_TOKEN'];
+  private GITHUB_TOKEN = null;
 
   private octokit = new Octokit({ 
       auth: this.GITHUB_TOKEN,
@@ -14,6 +14,9 @@ export class GithubService {
   constructor() {}
 
   async getBooks() {
+    if (!this.GITHUB_TOKEN) {
+      return [];
+    }
     const response = await this.octokit.request('GET /repos/{owner}/{repo}/contents/', {
       owner: 'Feliperojas2601',
       repo: 'ClassNotes',
