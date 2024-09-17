@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Octokit } from "octokit";
-import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,21 +8,12 @@ export class GithubService {
 
   async getBooks() {
     try {
-      const GITHUB_TOKEN = environment.githubToken;
-      if (!GITHUB_TOKEN) {
-        throw new Error('No se ha configurado el token de GitHub');
-      }
-      const octokit = new Octokit({ 
-        auth: GITHUB_TOKEN,
-      });
-      const response = await octokit.request('GET /repos/{owner}/{repo}/contents/', {
-        owner: 'Feliperojas2601',
-        repo: 'ClassNotes',
-      });
-      const books = await Promise.all(response.data.map(async (item: any) => {
+      const repoUrl = 'https://api.github.com/repos/Feliperojas2601/ClassNotes/contents';
+      const response = await fetch(repoUrl).then(response => response.json());
+      const books = await Promise.all(response.map(async (item: any) => {
           return {
               name: item.name.replaceAll('_', ' '),
-              pages: (await this.getPages(item.name, octokit))
+              pages: (await this.getPages(item.name))
                   .filter((page: any) => page !== null)
                   .sort((a: any, b: any) => {
                       return this.extractNumberFromName(a.name) - this.extractNumberFromName(b.name);
@@ -38,17 +27,11 @@ export class GithubService {
     }
   }
 
-  async getPages(bookName: string, octokit: any) {
+  async getPages(bookName: string) {
     try {
-      const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
-          owner: 'Feliperojas2601',
-          repo: 'ClassNotes',
-          path: bookName,
-      });
-      if (!response) {
-          return [];
-      }
-      const pages = (response as any).data.map((item: any) => {
+      const repoUrl = `https://api.github.com/repos/Feliperojas2601/ClassNotes/contents/${bookName}`;
+      const response = await fetch(repoUrl).then(response => response.json());
+      const pages = response.map((item: any) => {
           if (item.name === 'images') {
               return null;
           }
